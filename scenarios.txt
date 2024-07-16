@@ -1,0 +1,65 @@
+(Check solutions.txt for solution steps to the scenarios)
+
+Implicit assumptions:
+	- It's an XOR cipher
+	- Plaintext at worst belongs to printable ascii in range 0-127. It does not belong to extended ascii (128 and above).  When not supplying a plaintext alphabet to use with -a, printable is the default.
+	- Key used can be represented in hexadecimal, so valid key values are ascii 0-255 (0x00 - 0xff).
+	- Plaintext is in English (but 'e' can still be substituted by '3' for example). The cleartext will be understood by English speakers.
+
+
+
+ciphertext1.txt
+	- Difficulty: Trivial
+	- What you know for certain:
+		- Key length is 5 (even without this knowledge the crack is trivial)
+		- Known plaintext is THM{**********}
+
+ciphertext2.txt
+	- Difficulty: Medium
+	- What you know for certain:
+		- Key length is maximum 12 (this doesn't help that much anyway)
+		- Known plaintext is O24{*********************}
+
+ciphertext3.txt
+	- Difficulty: Easy
+	- What you know for certain:
+		- Plaintext alphabet is [A-Z]
+
+ciphertext4.txt
+	- Difficulty: Medium
+	- What you know for certain:
+		- Plaintext alphabet is [A-Z]
+
+ciphertext5.txt
+	- Difficulty: Easy
+	- What you know for certain:
+		- Plaintext alphabet is [A-Z]
+
+ciphertext6.txt
+	- Difficulty: Medium/Hard depending on your solution approach
+	- What you know for certain:
+		- Plaintext alphabet is [A-Z]
+
+ciphertext7.txt
+	- Difficulty: Very hard
+	- What you know for certain:
+		- Plaintext alphabet is [A-Z]
+	- Hints:
+		- Hint 1: You will need to iteratively build on guessed known plaintexts. A lot.
+		- Hint 2: Upon reaching a point where you understand what the plaintext is talking about, you might need to do some basic research about the topic if you are not familiar. No extreme in-depth knowledge is required, but it will probably make it easier for you if you understand what the cleartext is trying to say.
+
+ciphertext8.txt
+	- Difficulty: ? (maybe don't attempt this one)
+	- What you know for certain:
+		- One known plaintext char: Ä*******...  (you might need to use (on linux): printf "\xc4*****..." > known_plaintext.txt)
+		- Following implicit assumption no longer valid: "Plaintext is in English ... The cleartext will be understood by English speakers."
+		- Following implicit assumption no longer valid: "Plaintext at worst belongs to printable ascii in range 0-127". You know that this plaintext can be any printable in ascii 0-255.
+	- Hints:
+		- Hint 1: This plaintext and key combination was used for testing purposes.
+		- Hint 2: You know you have solved it when - given Hint 1 - the key values make sense to you.
+		
+ciphertext9.txt
+	- Difficulty: Medium
+	- What you know for certain:
+		- Four known plaintext chars: *********time** ...
+		- Following implicit assumption no longer valid: "Plaintext at worst belongs to printable ascii in range 0-127". You have no idea what alphabet plaintext might belong to, just that it's anything in ascii 0-255.

@@ -1,0 +1,172 @@
+Solutions for the various ciphertext.txt examples.
+
+--- ANTI-SPOLER, SCROLL DOWN FOR SOLUTIONS ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ciphertext1.txt:
+	Solution steps:
+		- Run with:   -l 5 -k "THM{**********}"
+	Key used: MYkey
+	Plaintext: THM{c001_fl4g5}
+
+
+ciphertext2.txt
+	Solution steps:
+		- We don't know key length but we do know partial plaintext, so we let known_plaintext_attack() do the job
+		- We see from the output that the first valid key length is 7. Looking at the - given the known plaintext - correct values in green, we think that a key length of 7 is unlikely due to characters \ and @ for example occurring. We continue this until we reach a key length of 10, for which the green plaintext actually looks like it could be correct.
+		- We know maximum key length is 12, so we could stop after that. Our most likely contender is key length = 10, because "cryp" and "s_Fu" look like they could belong to plaintext. We could run the program with -l 10 with our known plaintext, but we still have 5 unknown chars left, and a brute force of this would take way too long. If we knew or suspected the plaintext would belong to a smaller alphabet (like [A-Z]), we could reduce the key space and make brute force easier, but we don't.
+		- Our best option is to manually continue in -l 0 mode. "s_Fu*}" looks like it could be "s_Fun}", so we add to our known plaintext by re-running the program with "O24{****************s_Fun}" This adds 1 additional known character to the key, and the effect this had on the plaintext suggests that we are heading in the right direction.
+		- The plaintext probably begins with "O24{XOR", so we could try that. Or we can target "*s_Fun}": it could be "is_Fun}", "Is_Fun}" or "1s_Fun}" maybe. "crypti*" could be maybe "cryptic" or "encryption". Let's try what I think is the most likely: "XO*" --> "XOR", re-run program with "O24{XOR*************s_Fun}".
+		- "XOR*" might be "XOR_" (since we know from the start the spaces are probably represented by underscores), "cryptio*" is probably "cryption", and "*s_Fun" is still probably one of the three examples suggested earlier. Let's go with "O24{XOR***cryption**s_Fun}".
+		- The resulting "O24{XOR_**cryption**s_Fun}" suggests that "XOR_**cryption" might be "XOR_encryption", but on trying this we see that a key length of 10 is no longer possible! So we must have done something wrong. We try with capital E instead: "O24{XOR_Encryption**s_Fun}"
+		- This reveals the final two unknown characters to us which are "Is". This plaintext makes sense so we have probably cracked it.
+	Key used (in hex): 02040205020602070208
+	Plaintext: O24{XOR_Encryption_Is_Fun}
+
+
+ciphertext3.txt
+	Solution steps:
+		- Running in "-l 0" mode pretty convincingly suggests that the key length is 8
+		- After re-running with -l 8, the frequency analysis immediately gives the answer. Using only the best scoring key values gives the correct key. 
+	Key used: test_key
+	Plaintext: THISISAVERYSECRETMESSAGEISEVERYTHINGWORKINGASINTENDEDGOSHIHOPESOYOUALWAYSTHINKITWILLGOQUICKBUTSUCHISRARELYTHECASEWITHPROGRAMMING
+
+
+
+ciphertext4.txt
+	Solution steps:
+		- Based on the IoC analysis, key length 15 and 10 seem probable, where 15 seems the most probable. Let's go with 15.
+		- After running a frequency analysis with -l 15, the top scoring key values do not make the plaintext obvious, but studying tthe predicted plaintext result, it seems like some of the best performing key values are indeed correct. We see things like "SOMEAMMES" which could possibly be "SOMETIMES". At the end, we see "BURNEC" which could be "BURNED". I see two paths to go about this:
+		- Path 1: try guessing known plaintext
+			- After having inputed SOMETIMES at the correct place in the known plaintext and supplied this to the program, we can see two things: 
+				A: key looks to be human-readable: "****ry_l0ng_k**". Perhaps we can guess the key.
+				B: After opting to do a frequency analysis on the partially known plaintext and getting the plaintext from only the best scoring key values, we get: WOYEMITHEWAYTHATNAISOMETIMESIWITHMWASNTLIKETHITISISHIWASMOREFHRCIVINGBUTTHATPIWHCEASESTOEXITTSHENIGETBURNEC
+			- Let's pursue option B. From the partialy known, partially guessed (highest-scoring key values used) plaintext, it now looks a lot more readable. We notice for example "THEWAYTHAT", "WASNTLIKE", and "CEASESTOEXITTSHENIGETBURNEC". We could incrementally guess 1 additional plaintext char at a time, but to speed things up I am going to guess that "CEASESTOEXITTSHENIGETBURNEC" --> "CEASESTOEXISTWHENIGETBURNED" and run the program with that, which gives the correct plaintext.
+		- Path 2: brute force all permutations of top 2 best scoring keys (gives 32768 cleartexts), manually analyze the result (this is a more difficult and tedious path to take)
+			- First of all, we don't even know if the 100% correct plaintext exist in those 32768. We just assume that at least one of those 32768 cleartexts are going to be closer to the 100% correct one.
+			- Manually going through all cleartexts is cumbersome, but you might not need to. The idea is that you look at some of them to get an idea of a partial known plaintext, and continue with that.
+			- Maybe the first 3 chars are "WHY", let's try that as known plaintext.
+			- With that assumption, and still bruting the 2 top scoring key values for each key index, we are down to 4096 cleartexts to analyse.
+			- In those 4096 results, there are 2 cleartexts which have 14/15 key characters correct, they are:
+				- WHYEMITHEWAYTHATIAISOMETIMESIWISHMWASNTLIKETHISISISHIWASMOREFORCIVINGBUTTHATWIWHCEASESTOEXISTSHENIGETBURNED
+				- WHYDMITHEWAYTHATIAHSOMETIMESIWISHLWASNTLIKETHISIRISHIWASMOREFORBIVINGBUTTHATWIVHCEASESTOEXISTRHENIGETBURNED 
+			- The idea is that you would pick up on these or similar (through reducing brute force space by guessing known plaintext) and eventually finding the correct cleartext that way.
+	Key used: a_v3ry_l0ng_k3y
+	Plaintext: WHYAMITHEWAYTHATIAMSOMETIMESIWISHIWASNTLIKETHISIWISHIWASMOREFORGIVINGBUTTHATWISHCEASESTOEXISTWHENIGETBURNED
+	Author's note: Not all chi-score-predicted key values are in the top 2. key[3]'s actual correct value is the 3rd best score. Brute-forcing all top 2 most likely key values would never get you the 15/15 correct key, but two results are going to be 14/15 correct.
+
+
+
+ciphertext5.txt
+	Solution steps:
+		- Key length is almost certainly 15
+		- Compared to ciphertext4.txt, This text is longer with same key length, so the frequency analysis performs better. With key length = 15, the nr 1 top scoring key values seems to be correct for 14/15 key indexes. key[13]'s highest probability guess is wrong, but its second best guess is correct as it turns out.
+		- From the 14/15 correct plaintext, it is easy to guess the incorrect character. For example: "WHYAMITHEWAYTIATIAM" --> "WHYAMITHEWAYTHATIAM". Entering this as known plaintext gives us the correct cleartext.
+	Key used: a_v3ry_l0ng_k3y
+	Plaintext: WHYAMITHEWAYTHATIAMSOMETIMESIWISHIWASNTLIKETHISIWISHIWASMOREFORGIVINGBUTTHATWISHCEASESTOEXISTWHENIGETBURNEDALRIGHTTIMETOADDSOMETEXTTOTHISCIPHERTEXTTHEKEYISSOLONGSOITISVERYDIFFICULTTOPERFORMAFREQUENCYANALYSISONEACHSUBSTRINGOFTHECIPHERTEXTSINCETHESUBSTRINGWOULDONLYCONSISTOFABOUTSEVENCHARACTERSITSNOWONDERTHECHIVALUESWERENTTOPNOTCHACCURATE
+	Author's Note: Initial part same as ciphertext4.txt, but total length is a little over 3x the size of ciphertext4.txt.
+
+
+
+ciphertext6.txt
+	Solution steps:
+		- Key length is easily determined to 47
+		- The initial part of the key is almost 100% correctly guessed, with 1 char wrong (looking at key[21]'s top 2 chi squared values reveal that they are eerily close, both are 99.3214). We input "PORTFORWARDINGREDIRECTS..." as known plaintext.
+		- At this point you can make the challenge easier on yourself by recognizing that the key seems to be 0x00, 0x01, 0x02 etc. This will immediately solve 2/3 of the key. The following solution steps do not use this however.
+		- We see "LETHEPACKETSARETRAVERSI" as known text, this is probably "TRAVERSING"
+		- We see "DESTINATIONIPADDRESSAND" as known text. Given context about currently known cleartext, this could be "PORT"
+		- We see "ADDRESSANDPORTNUMBERCOMBI" as known text, this is probably "COMBINATION"
+		- We see "PORTFORWARDINGREDIRECTSACOMMUNICATI" as known, it's probably "COMMUNICATION"
+		- We see "HOSTRESIDINGONAPROTE" as known, this is probably "PROTECTED"
+		- We see "PORTFORWARDINGREDIRECTSACOMMUNICATIONREQU" as known, this is probably "REQUEST"
+		- We see "THISTECHNIQUEISMOSTCOMMONLYU***TOMAKE" where *** are unknown, this is probably "USED"
+		- Correct plaintext acquired!
+	Key used (in hex): 000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f087f9d087f9d087f9d087f9d087f9d
+	Plaintext: PORTFORWARDINGREDIRECTSACOMMUNICATIONREQUESTFROMONEADDRESSANDPORTNUMBERCOMBINATIONTOANOTHERWHILETHEPACKETSARETRAVERSINGANETWORKGATEWAYSUCHASAROUTERORFIREWALLTHISTECHNIQUEISMOSTCOMMONLYUSEDTOMAKESERVICESONAHOSTRESIDINGONAPROTECTEDORMASQUERADEDINTERNALNETWORKAVAILABLETOHOSTSONTHEOPPOSITESIDEOFTHEGATEWAYEXTERNALNETWORKBYREMAPPINGTHEDESTINATIONIPADDRESSANDPORTNUMBEROFTHECOMMUNICATIONTOANINTERNALHOST
+
+	
+ciphertext7.txt
+	Solution steps:
+		- Key length easily determined to 109. Frequency analysis on this is going to be tough since the key length is such a significant fraction on the ciphertext length. This results in the frequency analysis only being able to evaluate substrings with 5-6 characters each, not much data to perform frequency analysis on!
+		- The highest scoring key values produce some semblance of understandable text (that is, if you are aggressively optimistic), but much work is needed. They produce: "RATOIHLHNUOOOENENTIIENMENTALWKRIASLETHETTELLSRHEOPERATNNISYSUELWHEUELOSHVREHSOREAICHYEBLAIFTRENYCNLIENFTWATHSLOTEUOLUINCIHLESHGLWERTHATISOETDEWINEDSITHANADSOLUTEPASHHOREYALPLEMOPNHTSRGCELINLTWTAHSTEHTHEERCHHOCMNDOSDESSFEFNNCDTNDRTLETHIDAIEOTOWNEDGCLERDNSSOIEARBITTARYCOMMAIDYHICIIRRESHLNEDDYTNEEATHOMRTLFLEWOCSAWFORDYEIPNESSCEMTCPDARWDCAYENAATEMUIEWNFILESOKMEDEHESAIEWITHTNECONTENTTOHAREWESSESOETLACNWNEGEINMDENTWTEIMESAREWRHUAECAELSOOCGWEOAPEEONRRTETWEEIMOTHEFILEDRECUEERIGLTSANDTNENADDITTHTFEFRNNUOFTOEHATEAATITBLEUENHUSILHTOLRASOLWDPLEAORMAODCSORRTEWERDCOLELLPAOBERTHANIUYINTTNDEDBUNCTIOHBECAUSEOATFEMOEIGIEDWALH"
+		- We are not working with much, and a brute-force of the top 2 performing key values for each index is out of the question (it would result in brute forcing 649037107316853453566312041152512 key permutations). We need to start taking guesses on the plaintext in order to move forward. We see "MENTAL" pretty close to the beginning, let's start by assuming this is correct and give a known plaintext of "**********************MENTAL...". The resulting 5 other 6-char long substrings in green all look like they could belong to the plaintext so we assume our guess is correct.
+		- This did not change anything about our current best guess at the plaintext (since the frequency analysis had already predicted it), but it does provide some foundation to build upon. The foundation is built with paper as opposed to concrete, as we can not 100% guarantee that it is correct, but we must assume certain things and build upon those assumptions in order to move forward. Since our key length is about 100 and ciphertext length about 600, every guess we make means that that guess needs to also hold true for 5 other parts of the plaintext. This can help guide us on whether we have guessed correctly or not.
+		- We continue our guessing. On ciphertext character nr 150 we find "THANADSOLUTE", perhaps this is "THANABSOLUTE". This guess seems to be correct, as the effect this had on the 5 other parts of the plaintext seem correct as well.
+		- Near the end we see "BUNCTIONBECAUSE", where the initial "BU" and final "E" are not green. We think this might be: "FUNCTIONBECAUSE" which would make 3 additional key chars known. We try it and all green parts of plaintext still look correct.
+		- Near the beginning we see "THATTELLSTHEOPERATNNISYSUEL", where the initial "TH" and final "TNNISYSUEL" are unknown. "OPERA"might be "OPERATION" or "OPERATING" maybe, but, with "TELLSTHEOPERAT" as context, we think the remaining parts are "OPERATINGSYSTEM". This guess is further supported by the fact that "T", "N", "SYS", "E" are already guessed by the frequency analysis, and they are in the correct place for "OPERATINGSYSTEM". SO now we go from "THATTELLSTHEOPERATNNISYSUEL" --> "THATTELLSTHEOPERATINGSYSTEM". The results of this guess suggests that we are on the correct track.
+		- We see "FOREXAMPLE" where final "PLE" are unknown. Those are probably already correct, add them to the known plaintext.
+		- Near the end we see "INTTNDEDFUNCTION" where the initial "INTTND" are unknown. We guess "INTENDEDFUNCTION" (only one "T" was wrongly guessed by frequency analysis, rest already fit "INTENDED"). The results seem correct and we just guessed 6 additional key chars, way to go!
+		- We see "FILEDRECUTERIGHTS" where "DR" are unknown. This is probably "FILEEXECUTERIGHTS"
+		- We now have 6 large chunks of known plaintext distributed across the ciphertext, and about 1/3 of the key guessed. The remaining cryptanalysis probably requires some knowledge of what the plaintext is talking about in order to complete the decryption.
+		- We see "ENTIIENMENTALVARIABLE" where the initial "ENTIIEN" is unknown. With context, this is probably "ENVIRONMENTALVARIABLE". This guess is supported by the fact that some freq-analysis guessed chars are already correct.
+		- Near the beginning, in "TELLSTHEOPERATINGSYSTEMWHEUE" the final "UE" are unknown. With context, this is probably supposed to be "WHERE"
+		- We see "COMMANDWHICHISRESOLNED" where final "NED" are unknown. Given context and top scoring key guesses we think the final part is probably "RESOLVED"
+		- For this next step especially I rely on understanding what the text is talking about, which has now become more clear. It's talking about the Linux PATH variable, an environmental variable which tells the operating system where to search for executables. This allows me to make a relatively big leap: "ADDITTOTHEFRONTOFTHEPATEAATITBLE", where the final "EAATITBLE" is unknown, is probably "PATHVARIABLE".
+		- "SEARCHFOREAICHYEBLA" where final "AICHYEBLA" is unknown is probably "EXECUTABLE"
+		- "LINUXWILLSTAHTHEERCHHOC" where final "HTHEERCHHOC" is unknown could be "STARTSEARCHING". This is a leap for sure, but with context, knowledge of what PATH in Linux is, grammatical tense context (it cant be "LINUXWILLSTARTSEARCH", it must be "LINUXWILLSTARTSEARCHING") and recognizing that this guess is supported by best performing key values, it is not unreasonable to be able to come to this conclusion.
+		- "SUCHASFOREXAIPNE" where final "IPNE" are unknown. This is most certainly "FOREXAMPLE"
+		- "RESOLVETHECORMAOD" where final "RMAOD" are unknown. This is probably "COMMAND"
+		- "OLELLRATHERTHANITSINTENDEDFUNCTION" where initial "OLE" are unknown. With knowledge about Linux PATH and context from plaintext about "CONTENTSOFAREVERSESHELL" we can guess that "OLELL" --> "SHELL"
+		- Since plaintext is talking about replacing a file with a reverse shell, and getting PATH to execute this reverse shell, I'm guessing our previous guess can be expanded upon: "TEWERDCSHELL" --> "REVERSESHELL"
+		- "ONCGWEOAVEDONETHAT" where "GWEOA" is unknown. This could be "ONCEWEHAVEDONETHAT"
+		- Decryption complete. If you made it this far on your own with a similar method of building upon guessed known plaintext, I salute you. This took me hours (even though I was the one who wrote the plaintext!).
+		 
+	Key used (in hex): 803dc3c00b8446bdabed16ec9d6fe4fa8acd93eac0c8f5bd160d635cf3d8530b7232ea020414ea40abcdfaf3760c50c57bfdf90928a3b67c20741265ae6d304ce85b0173fe31bcce6a0bc662ba854dd7f37197e26d341b6d10948356d7850051035628b5e2b93d995447f16a95
+	Plaintext: PATHINLINUXISANENVIRONMENTALVARIABLETHATTELLSTHEOPERATINGSYSTEMWHERETOSEARCHFOREXECUTABLESFORANYCOMMANDTHATISNOTBUILTINTOTHESHELLORTHATISNOTDEFINEDWITHANABSOLUTEPATHFOREXAMPLEJOHNHYDRACPLINUXWILLSTARTSEARCHINGINFOLDERSDEFINEDUNDERPATHIFAROOTOWNEDFILERUNSSOMEARBITRARYCOMMANDWHICHISRESOLVEDINTHEPATHVARIABLESUCHASFOREXAMPLELSCDMVCPCATWECANCREATEOUROWNFILESNAMEDTHESAMEWITHTHECONTENTSOFAREVERSESHELLANYWHEREINTHESYSTEMWEHAVEWRITEACCESSONCEWEHAVEDONETHATWEGIVETHEFILEEXECUTERIGHTSANDTHENADDITTOTHEFRONTOFTHEPATHVARIABLELINUXWILLNOWRESOLVETHECOMMANDASOURREVERSESHELLRATHERTHANITSINTENDEDFUNCTIONBECAUSEOFTHEMODIFIEDPATH
+
+
+
+ciphertext8.txt
+	Solution steps (this one is stupid):
+		- Once I got the known plaintext interpreted correctly (by using printf and \xc4 to represent 'Ä'), the first possible key length is 60. Looking at other possible lengths, none of the plaintexts seem to make sense. The scenario did say that the implicit assumption that the plaintext will make sense is no longer valid, and the hints were that the plaintext and key were used for testing purposes. Hmm.
+		- Known key starts with \x00, which means that there is no difference between the first known character and first char in ciphertext. Looking at the ciphertext, it seems to follow a weird pattern of incrementing by 1 a couple of times, then jumping to another value and repeating.
+		- * Warning: illogical jump to conclusion incoming *
+		- What happens if we go from Ä******** ... --> ÄÄÄÄÄ**** ... ? Let's try.
+		- Key length = 120 is now the first valid one. Looking at the key, we have achieved a pattern of \x00\x01\x02\x03\x04. Maybe we are on to something, let's continue by having the first 100 chars being 'Ä', and see if any plaintexts are valid.
+		- With the addition, the key continued its trend if incrementing by 1. It has incremented from \x00 to \x63 (ascii: 'c'). Let's add 100 more 'Ä'!
+		- Key keeps incrementing. Let's do 300 'Ä'. We now see something peculiar: key length 0-255 impossible, key length 256 results in a full known plaintext of 'Ä' with key values from incrementing from \x00 to \xff, key lenghts 257-351 impossible.
+		- One hint said: "You know you have solved it when - given Hint 1 - the key values make sense to you" At this point the key values make sense to me. Solved.
+	Key used (in hex): 000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff 
+	Plaintext: 'Ä' * 515
+
+
+
+ciphertext9.txt
+	Solution steps:
+		- Given the known plaintext, the first probable key length seems to be 22, prior key lengths produce what look to be garbage. From length 22 we can make out several words like "Let'", " new" and even the end of a sentence with punctuation followed by a capital letter: "1. T". There are however several unprintables in the supposed correct key length like "\x82\x83\x84\x85". They do seem to follow a pattern of incrementing by 1 (which would be unlikely for random text), so this is still probably the correct key length. Let's build on it.
+		- "Let'*" --> "Let's". This seems correct, partly because the incrementing unprintables incremented by 1 again. It would really just be easier if we could add unprintables as our known plaintext, but how best to do that?
+		- To add unprintables I used the -K option for known plaintext in file, and the linux printf command which recognizes hexcode. To insert unprintables, I just did: printf "**** ... \x0f\x10\x11\x12\x13\x14\x15 ... ****" > known_plaintext.txt. I kept incrementing the pattern, but after \x1f adding \x20 made the plaintext look wrong, so I stopped incrementing that particular pattern and moved on to "\x91\x92*****\x98\x99", which revealed the correct plaintext.
+		- Note: When attempting to add some printables with ascii value above 127 in the printf command, things got weird. Best use the hexadecimal representation of that char when using printf.
+	Key used: 2nbdf72340jnspd+#"/(&# 
+	Plaintext (in hex): 416c72696768742c2074696d6520746f207465737420667572746865722e204c657427732073656520686f772077656c6c207468652070726f6772616d2068616e646c657320756e7072696e7461626c657320696e2074686520706c61696e746578742e2049276d20676f696e6720746f20666972737420696e636c75646520616c6c20617363696920302d33312e205468656e2c20666f6c6c6f77696e672074776f206e65776c696e65732c2049276c6c20696e636c756465206173636969203132372d3235352e204865726520776520676f3a0a000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f0a0a7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff

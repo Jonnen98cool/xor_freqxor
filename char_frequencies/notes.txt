@@ -1,0 +1,4 @@
+english_frequencies_uppercase.json:
+	- Source: http://en.algoritmy.net/article/40379/Letter-frequency-English   on 3rd of July 2024
+	- Are these frequencies obtained from uppercase-only text? Or are they treated as if there is no differention between upper and lowercase in regular text with spaces, commas, periods, exclamation marks etc?
+	- Either way they seem to work very well for several [A-Z] cleartexts I have tested them on
