@@ -52,9 +52,8 @@ def known_plaintext_attack():
                 print("\tKey length = " + str(i) + ": Impossible (known parts of cleartext NOT in supplied alphabet)")
 
 
-    # print(f"\n\tFind the correct key length and start bruteforcing with that information.")
-    # print("\t--- OR ---")
-    # print(f"\tIteratively replace a non-green colored character in the known plaintext with a guess, rerun the program with -l 0.")
     print(f"\n\tFind the correct key length and re-run the program with that information.")
+    print(f"\t OR")
+    print(f"\tIteratively replace a non-green colored character in the known plaintext with a guess, rerun the program with -l 0.")
 
     print(f"--- ENDING: KNOWN PLAINTEXT ATTACK ---")

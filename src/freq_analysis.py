@@ -120,7 +120,7 @@ def brute_n_best_keys(possible_key_values:[[str]], top_key_indexes:[[int]]):
     top_performing_key = [str(x) for innerlist in get_n_best_key_values(possible_key_values, top_key_indexes, 1) for x in innerlist]  # 2D-list to 1D-list
     print(f"\tThe frequency analysis' best prediction for the key is the following: {top_performing_key}", file=sys.__stdout__)
     print(f"\tThis would result in the plaintext looking like: " + "".join(utils.to_printable(utils.perform_xor(top_performing_key, g.CIPHERTEXT))), file=sys.__stdout__ )
-    print(f"\t(If this is satisfactory you may exit the program)")
+    print(f"\tIf this guessed plaintext gives you an idea for partial known plaintext, you should re-run the program with that.")
 
     total_possible_keys = utils.get_key_permutations(possible_key_values)
     print(f"\n\tThere are a total of {total_possible_keys} valid key permutations to brute-force. Input {g.PRINT_UINPUT}0{g.END_COLOR} if you wish to do this.", file=sys.__stdout__)
