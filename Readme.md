@@ -4,9 +4,20 @@ An XOR cryptanalysis tool.
 ## Features
 xor_freqxor is capable of:
 - Performing known plaintext attacks
+- Brute-forcing unknown key characters
 - Figuring out key length by using IoC (currently only if cleartext is in alphabet [A-Z])
 - Finding most likely plaintext by using frequency analysis after key length has been determined (currently only if plaintext is in alphabet [A-Z])
 - Combining known plaintext attack with frequency analysis (currently only if plaintext is in alphabet [A-Z])
+
+# Installation
+Requires Python 3.9.0 or above (you can't strongly type like `key:[str]` prior to 3.9 without having to import stuff...)
+- Check your version: `python --version`
+- If < 3.9, update. Here are some examples which *may* work for you:
+  - **Windows**
+    - Easiest way is probably to run the official installer: https://www.python.org/downloads/
+    - Tough luck for Windows 7 users, as official python releases stopped supporting it from 3.9 and onwards. There still exist unofficial python versions 3.9 and above with Windows 7 support however.
+  - **Linux**
+    - `sudo apt install python3`
 
 # Usage
 Here are some examples to get you started:
