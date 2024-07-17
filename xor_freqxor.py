@@ -33,6 +33,7 @@ def parse_args():
                         description='Usage example (unknown key length, partially known plaintext): python xor_freqxor.py -l 0 -k "CTF{************}" -C my_ciphertext.txt\n\n'
                                     'An XOR cryptanalysis tool capable of:\n'
                                     '\t- Performing known plaintext attacks\n'
+                                    '\t- Brute-forcing unknown key characters\n'
                                     '\t- Figuring out key length by using IoC (only if cleartext is in alphabet [A-Z])\n'
                                     '\t- Finding most likely plaintext by using frequency analysis after key length has been determined (only if plaintext is in alphabet [A-Z])\n'
                                     '\t- Combining known plaintext attack with frequency analysis (only if plaintext is in alphabet [A-Z])\n\n',
@@ -178,7 +179,8 @@ if __name__ == '__main__':
     print(f"__main__: xor_freqxor starting with:")
     print(f"\t- Key length: " + ("Unknown" if g.KEY_LENGTH == 0 else str(g.KEY_LENGTH)))
     print(f"\t- Partial plaintext known? " + ("Yes" if known_plaintext_exists else "No"))
-    print(f"\t- Plaintext characters are in alphabet (length {len(g.CLEARTEXT_ALPHABET)}): {g.CLEARTEXT_ALPHABET}\n")
+    print(f"\t- Plaintext characters are in alphabet (length {len(g.CLEARTEXT_ALPHABET)}): {g.CLEARTEXT_ALPHABET}")
+    print(f"IMPORTANT: Make sure your terminal supports colored output, the following text should be colored blue: {g.PRINT_BLUE}I'm blue bada bee{g.END_COLOR}\n")
 
     # generating stuff for testing purposes
     #print(f"Generated hex: {utils.generate_hex_in_range(127, 256)}")
